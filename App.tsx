@@ -6,6 +6,7 @@ import BookingPage from './pages/Booking';
 import AdminDashboard from './pages/AdminDashboard';
 import AIChatBot from './components/AIChatBot';
 import { INITIAL_SERVICES, INITIAL_ARTISTS } from './services/mockData';
+import { subscribeToBookings } from './services/firebase';
 import { Booking, BookingStatus } from './types';
 import { CheckCircle, X } from 'lucide-react';
 
@@ -27,28 +28,20 @@ const SuccessPage = () => (
 );
 
 const App: React.FC = () => {
-  // State for data persistence
-  const [bookings, setBookings] = useState<Booking[]>(() => {
-    const saved = localStorage.getItem('glowup_bookings');
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  // Bookings state now managed via subscription
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
 
-  // Persistence effect
+  // Real-time subscription to data source (Firebase or LocalStorage)
   useEffect(() => {
-    localStorage.setItem('glowup_bookings', JSON.stringify(bookings));
-  }, [bookings]);
-
-  const addBooking = (newBooking: Booking) => {
-    setBookings(prev => [newBooking, ...prev]);
-  };
-
-  const updateBookingStatus = (id: string, status: BookingStatus) => {
-    setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
-  };
+    const unsubscribe = subscribeToBookings((data) => {
+      setBookings(data);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Password protected toggle logic
   const toggleAdmin = () => {
@@ -122,7 +115,6 @@ const App: React.FC = () => {
                 <BookingPage 
                   services={INITIAL_SERVICES} 
                   artists={INITIAL_ARTISTS} 
-                  addBooking={addBooking} 
                 />
               } 
             />
@@ -135,7 +127,6 @@ const App: React.FC = () => {
                     bookings={bookings}
                     services={INITIAL_SERVICES}
                     artists={INITIAL_ARTISTS}
-                    updateBookingStatus={updateBookingStatus}
                   />
                 ) : (
                   <div className="p-8 text-center flex flex-col items-center justify-center min-h-[50vh]">

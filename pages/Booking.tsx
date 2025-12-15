@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Service, Artist, Booking, BookingStatus } from '../types';
+import { createBooking } from '../services/firebase';
 import { Check, Calendar as CalendarIcon, Clock, User, Sparkles } from 'lucide-react';
 
 interface BookingPageProps {
   services: Service[];
   artists: Artist[];
-  addBooking: (booking: Booking) => void;
 }
 
-const BookingPage: React.FC<BookingPageProps> = ({ services, artists, addBooking }) => {
+const BookingPage: React.FC<BookingPageProps> = ({ services, artists }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -41,29 +41,31 @@ const BookingPage: React.FC<BookingPageProps> = ({ services, artists, addBooking
     setStep(prev => prev - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API delay
-    setTimeout(() => {
-      const newBooking: Booking = {
-        id: Math.random().toString(36).substr(2, 9),
-        serviceId: selectedServiceId,
-        artistId: selectedArtistId,
-        customerName: customerInfo.name,
-        customerPhone: customerInfo.phone,
-        date,
-        time,
-        status: BookingStatus.PENDING,
-        createdAt: Date.now(),
-        notes: customerInfo.notes
-      };
+    const newBooking: Booking = {
+      id: Math.random().toString(36).substr(2, 9), // Temp ID, will be replaced by Firestore ID
+      serviceId: selectedServiceId,
+      artistId: selectedArtistId,
+      customerName: customerInfo.name,
+      customerPhone: customerInfo.phone,
+      date,
+      time,
+      status: BookingStatus.PENDING,
+      createdAt: Date.now(),
+      notes: customerInfo.notes
+    };
 
-      addBooking(newBooking);
-      setIsSubmitting(false);
-      navigate('/success');
-    }, 1500);
+    const success = await createBooking(newBooking);
+
+    if (success) {
+        navigate('/success');
+    } else {
+        alert("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại!");
+        setIsSubmitting(false);
+    }
   };
 
   const selectedService = services.find(s => s.id === selectedServiceId);

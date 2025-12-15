@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
 import { Booking, BookingStatus, Service, Artist } from '../types';
-import { CheckCircle, XCircle, Clock, Search, Filter } from 'lucide-react';
+import { updateBookingStatus, isFirebaseEnabled } from '../services/firebase';
+import { CheckCircle, XCircle, Clock, Search, Filter, Database, AlertTriangle } from 'lucide-react';
 
 interface AdminDashboardProps {
   bookings: Booking[];
   services: Service[];
   artists: Artist[];
-  updateBookingStatus: (id: string, status: BookingStatus) => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ bookings, services, artists, updateBookingStatus }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ bookings, services, artists }) => {
   const [filterStatus, setFilterStatus] = useState<BookingStatus | 'ALL'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const getServiceName = (id: string) => services.find(s => s.id === id)?.name || 'Unknown Service';
+
+  const handleStatusUpdate = async (id: string, status: BookingStatus) => {
+    setUpdatingId(id);
+    await updateBookingStatus(id, status);
+    setUpdatingId(null);
+  };
 
   const filteredBookings = bookings.filter(booking => {
     const matchesStatus = filterStatus === 'ALL' || booking.status === filterStatus;
@@ -22,8 +29,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ bookings, services, art
     return matchesStatus && matchesSearch;
   }).sort((a, b) => b.createdAt - a.createdAt);
 
+  const isDBConnected = isFirebaseEnabled();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8">
+      {/* DB Connection Status Banner */}
+      <div className={`mb-6 rounded-lg p-3 flex items-center justify-between ${isDBConnected ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-orange-50 text-orange-800 border border-orange-200'}`}>
+         <div className="flex items-center gap-2">
+            {isDBConnected ? <Database className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+            <span className="text-sm font-medium">
+                {isDBConnected 
+                    ? "Đang kết nối Database Online (Real-time)" 
+                    : "Đang chạy chế độ DEMO (LocalStorage - Chỉ lưu trên máy này). Vui lòng cấu hình Firebase để đồng bộ."}
+            </span>
+         </div>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Quản Lý Đặt Lịch</h1>
@@ -119,32 +140,38 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ bookings, services, art
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        {booking.status === BookingStatus.PENDING && (
-                            <div className="flex justify-end gap-2">
-                                <button 
-                                    onClick={() => updateBookingStatus(booking.id, BookingStatus.CONFIRMED)}
-                                    className="text-green-600 hover:text-green-900 bg-green-50 p-1.5 rounded-full transition-colors"
-                                    title="Xác nhận"
-                                >
-                                    <CheckCircle className="w-5 h-5" />
-                                </button>
-                                <button 
-                                    onClick={() => updateBookingStatus(booking.id, BookingStatus.CANCELLED)}
-                                    className="text-red-600 hover:text-red-900 bg-red-50 p-1.5 rounded-full transition-colors"
-                                    title="Hủy bỏ"
-                                >
-                                    <XCircle className="w-5 h-5" />
-                                </button>
-                            </div>
+                        {updatingId === booking.id ? (
+                            <span className="text-gray-400 text-xs">Đang lưu...</span>
+                        ) : (
+                            <>
+                                {booking.status === BookingStatus.PENDING && (
+                                    <div className="flex justify-end gap-2">
+                                        <button 
+                                            onClick={() => handleStatusUpdate(booking.id, BookingStatus.CONFIRMED)}
+                                            className="text-green-600 hover:text-green-900 bg-green-50 p-1.5 rounded-full transition-colors"
+                                            title="Xác nhận"
+                                        >
+                                            <CheckCircle className="w-5 h-5" />
+                                        </button>
+                                        <button 
+                                            onClick={() => handleStatusUpdate(booking.id, BookingStatus.CANCELLED)}
+                                            className="text-red-600 hover:text-red-900 bg-red-50 p-1.5 rounded-full transition-colors"
+                                            title="Hủy bỏ"
+                                        >
+                                            <XCircle className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                )}
+                                {booking.status === BookingStatus.CONFIRMED && (
+                                    <button 
+                                    onClick={() => handleStatusUpdate(booking.id, BookingStatus.COMPLETED)}
+                                    className="text-blue-600 hover:text-blue-900 text-xs border border-blue-200 px-3 py-1 rounded-full transition-colors hover:bg-blue-50"
+                                    >
+                                    Hoàn thành
+                                    </button>
+                                )}
+                            </>
                         )}
-                         {booking.status === BookingStatus.CONFIRMED && (
-                            <button 
-                            onClick={() => updateBookingStatus(booking.id, BookingStatus.COMPLETED)}
-                            className="text-blue-600 hover:text-blue-900 text-xs border border-blue-200 px-3 py-1 rounded-full transition-colors hover:bg-blue-50"
-                            >
-                            Hoàn thành
-                            </button>
-                         )}
                       </td>
                     </tr>
                   ))
