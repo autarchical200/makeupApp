@@ -25,11 +25,12 @@ const Home: React.FC<HomeProps> = ({ services, artists }) => {
         </div>
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6">
-            Đánh thức vẻ đẹp <span className="text-rose-300 italic">tiềm ẩn</span>
+            Sun Makeup <br/>
+            <span className="text-rose-300 italic text-2xl md:text-4xl">by Nhật Nhật</span>
           </h1>
           <p className="text-xl text-rose-100 max-w-2xl mb-10">
-            Dịch vụ trang điểm chuyên nghiệp cùng Minh Anh.
-            Tận tâm, tỉ mỉ và thấu hiểu từng đường nét trên gương mặt bạn.
+            Đánh thức vẻ đẹp rạng ngời của riêng bạn.
+            Chuyên nghiệp, tận tâm và thấu hiểu.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
@@ -47,7 +48,7 @@ const Home: React.FC<HomeProps> = ({ services, artists }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-serif font-bold text-gray-900">Dịch Vụ Nổi Bật</h2>
-          <p className="mt-4 text-gray-500">Các gói trang điểm được yêu thích nhất</p>
+          <p className="mt-4 text-gray-500">Các gói trang điểm được yêu thích nhất tại Sun Makeup</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -97,9 +98,9 @@ const Home: React.FC<HomeProps> = ({ services, artists }) => {
                           Chào bạn, mình là <span className="text-rose-600">{mainArtist.name}</span>
                       </h2>
                       <p className="text-gray-600 mb-6 leading-relaxed">
-                          Với hơn 5 năm kinh nghiệm trong nghề cầm cọ, mình luôn tâm niệm rằng trang điểm không phải là che đi gương mặt thật, mà là tôn vinh những nét đẹp sẵn có của bạn. 
+                          Với kinh nghiệm dày dạn trong nghề make up, Nhật Nhật luôn tâm niệm rằng trang điểm không phải là che đi gương mặt thật, mà là tôn vinh những nét đẹp sẵn có của bạn. 
                           <br/><br/>
-                          Dù bạn cần một vẻ ngoài lộng lẫy cho ngày cưới hay một phong cách nhẹ nhàng để dạo phố, mình luôn sẵn sàng lắng nghe và sáng tạo để bạn tự tin nhất.
+                          Tại Sun Makeup, mỗi khách hàng là một "mặt trời" tỏa sáng theo cách riêng. Dù bạn cần lộng lẫy cho ngày cưới hay nhẹ nhàng dạo phố, mình luôn sẵn sàng lắng nghe.
                       </p>
                       
                       <div className="space-y-3 mb-8">

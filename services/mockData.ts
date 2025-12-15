@@ -38,7 +38,7 @@ export const INITIAL_SERVICES: Service[] = [
 export const INITIAL_ARTISTS: Artist[] = [
   {
     id: 'a1',
-    name: 'Minh Anh',
+    name: 'Nhật Nhật',
     level: 'Master',
     rating: 5.0,
     imageUrl: 'https://images.unsplash.com/photo-1583336663277-620dc1996580?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',

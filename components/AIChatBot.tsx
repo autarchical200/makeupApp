@@ -50,7 +50,8 @@ const AIChatBot: React.FC = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 bg-rose-600 hover:bg-rose-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 group animate-bounce"
+          /* Changed bottom-6 to bottom-24 on mobile (default) and bottom-6 on md screens */
+          className="fixed bottom-24 md:bottom-6 right-6 z-50 bg-rose-600 hover:bg-rose-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 group animate-bounce"
         >
           <Sparkles className="w-6 h-6" />
           <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
@@ -61,7 +62,7 @@ const AIChatBot: React.FC = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-rose-100 flex flex-col overflow-hidden h-[500px]">
+        <div className="fixed bottom-24 md:bottom-6 right-6 z-50 w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-rose-100 flex flex-col overflow-hidden h-[500px]">
           {/* Header */}
           <div className="bg-rose-600 p-4 flex justify-between items-center text-white">
             <div className="flex items-center gap-2">

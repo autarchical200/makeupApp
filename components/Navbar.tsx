@@ -1,6 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { Sparkles, Calendar, LayoutDashboard, User } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Sparkles, Calendar, LayoutDashboard, User, Lock, LogOut } from 'lucide-react';
 
 interface NavbarProps {
   isAdmin: boolean;
@@ -8,6 +8,20 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ isAdmin, toggleAdmin }) => {
+  const navigate = useNavigate();
+
+  // Handle mobile bottom bar click for admin/login
+  const handleMobileAdminClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAdmin) {
+        // If already admin, go to dashboard
+        navigate('/admin');
+    } else {
+        // If not admin, trigger toggle (which asks for password)
+        toggleAdmin();
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-rose-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,7 +31,10 @@ const Navbar: React.FC<NavbarProps> = ({ isAdmin, toggleAdmin }) => {
             <div className="bg-rose-600 p-1.5 rounded-lg rotate-3">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <span className="font-serif text-2xl font-bold text-gray-900 tracking-tight">GlowUp</span>
+            <div className="flex flex-col">
+                <span className="font-serif text-xl font-bold text-gray-900 tracking-tight leading-none">Sun Makeup</span>
+                <span className="text-[10px] text-rose-600 font-medium tracking-wider uppercase">by Nhật Nhật</span>
+            </div>
           </div>
 
           {/* Desktop Menu */}
@@ -56,23 +73,23 @@ const Navbar: React.FC<NavbarProps> = ({ isAdmin, toggleAdmin }) => {
             )}
           </div>
 
-          {/* Admin Toggle Switch (Mock Auth) */}
-          <div className="flex items-center">
+          {/* Admin Toggle Switch (Desktop) */}
+          <div className="hidden md:flex items-center">
             <button
               onClick={toggleAdmin}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 isAdmin ? 'bg-gray-900 text-white' : 'bg-rose-100 text-rose-800 hover:bg-rose-200'
               }`}
             >
-              {isAdmin ? <LayoutDashboard className="w-3 h-3" /> : <User className="w-3 h-3" />}
-              {isAdmin ? 'Mode: Admin' : 'Mode: Khách'}
+              {isAdmin ? <LogOut className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+              {isAdmin ? 'Đăng xuất Admin' : 'Đăng nhập Admin'}
             </button>
           </div>
         </div>
       </div>
       
-      {/* Mobile Menu Bottom Bar (Simplified) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around p-3 z-50">
+      {/* Mobile Menu Bottom Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around p-3 z-50 pb-safe">
         <NavLink to="/" className={({isActive}) => `flex flex-col items-center gap-1 ${isActive ? 'text-rose-600' : 'text-gray-500'}`}>
           <Sparkles className="w-6 h-6" />
           <span className="text-[10px]">Home</span>
@@ -81,12 +98,15 @@ const Navbar: React.FC<NavbarProps> = ({ isAdmin, toggleAdmin }) => {
           <Calendar className="w-6 h-6" />
           <span className="text-[10px]">Đặt lịch</span>
         </NavLink>
-        {isAdmin && (
-           <NavLink to="/admin" className={({isActive}) => `flex flex-col items-center gap-1 ${isActive ? 'text-rose-600' : 'text-gray-500'}`}>
-           <LayoutDashboard className="w-6 h-6" />
-           <span className="text-[10px]">Admin</span>
-         </NavLink>
-        )}
+        
+        {/* Mobile Admin/Login Button */}
+        <button 
+            onClick={handleMobileAdminClick} 
+            className={`flex flex-col items-center gap-1 ${isAdmin ? 'text-rose-600' : 'text-gray-500'}`}
+        >
+           {isAdmin ? <LayoutDashboard className="w-6 h-6" /> : <User className="w-6 h-6" />}
+           <span className="text-[10px]">{isAdmin ? 'Quản lý' : 'Admin'}</span>
+        </button>
       </div>
     </nav>
   );
